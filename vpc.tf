@@ -128,6 +128,13 @@ resource "aws_vpc_peering_connection" "primary-secondary" {
   vpc_id        = aws_vpc.primary-west-2.id
   peer_region   = "us-east-2"
 
+  accepter {
+    allow_remote_vpc_dns_resolution = true
+  }
+
+  requester {
+    allow_remote_vpc_dns_resolution = true
+  }
 
   tags = {
     Name = "Primary-Secondary"
