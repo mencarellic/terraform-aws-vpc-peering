@@ -147,7 +147,7 @@ resource "aws_vpc_peering_connection_accepter" "secondary-primary" {
 }
 
 resource "aws_vpc_peering_connection_options" "primary" {
-  vpc_peering_connection_id = aws_vpc_peering_connection_accepter.primary-secondary.id
+  vpc_peering_connection_id = aws_vpc_peering_connection_accepter.secondary-primary.id
 
   requester {
     allow_remote_vpc_dns_resolution = true
@@ -157,7 +157,7 @@ resource "aws_vpc_peering_connection_options" "primary" {
 }
 
 resource "aws_vpc_peering_connection_options" "secondary" {
-  vpc_peering_connection_id = aws_vpc_peering_connection_accepter.primary-secondary.id
+  vpc_peering_connection_id = aws_vpc_peering_connection_accepter.secondary-primary.id
 
   accepter {
     allow_remote_vpc_dns_resolution = true
