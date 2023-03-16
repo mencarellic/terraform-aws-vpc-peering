@@ -128,14 +128,6 @@ resource "aws_vpc_peering_connection" "primary-secondary" {
   vpc_id        = aws_vpc.primary-west-2.id
   peer_region   = "us-east-2"
 
-  accepter {
-    allow_remote_vpc_dns_resolution = true
-  }
-
-  requester {
-    allow_remote_vpc_dns_resolution = true
-  }
-
   tags = {
     Name = "Primary-Secondary"
   }
@@ -149,6 +141,26 @@ resource "aws_vpc_peering_connection_accepter" "secondary-primary" {
 
   tags = {
     Side = "Secondary"
+  }
+
+  provider = aws.east-2
+}
+
+resource "aws_vpc_peering_connection_options" "primary" {
+  vpc_peering_connection_id = aws_vpc_peering_connection_accepter.primary-secondary.id
+
+  requester {
+    allow_remote_vpc_dns_resolution = true
+  }
+
+  provider = aws.west-2
+}
+
+resource "aws_vpc_peering_connection_options" "secondary" {
+  vpc_peering_connection_id = aws_vpc_peering_connection_accepter.primary-secondary.id
+
+  accepter {
+    allow_remote_vpc_dns_resolution = true
   }
 
   provider = aws.east-2
