@@ -126,7 +126,6 @@ resource "aws_vpc_peering_connection" "primary-secondary" {
   peer_owner_id = local.account_id
   peer_vpc_id   = aws_vpc.secondary-east-2.id
   vpc_id        = aws_vpc.primary-west-2.id
-  auto_accept   = true
   peer_region   = "us-east-2"
 
 
@@ -135,6 +134,17 @@ resource "aws_vpc_peering_connection" "primary-secondary" {
   }
 
   provider = aws.west-2
+}
+
+resource "aws_vpc_peering_connection_accepter" "secondary-primary" {
+  vpc_peering_connection_id = aws_vpc_peering_connection.primary-secondary.id
+  auto_accept               = true
+
+  tags = {
+    Side = "Secondary"
+  }
+
+  provider = aws.east-2
 }
 
 resource "aws_route" "peering-primary" {
