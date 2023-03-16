@@ -39,6 +39,24 @@ resource "aws_subnet" "primary-b" {
   provider = aws.west-2
 }
 
+resource "aws_route_table" "primary" {
+  vpc_id = aws_vpc.primary-west-2.id
+
+  tags = {
+    Name = "primary-west-2"
+  }
+}
+
+resource "aws_route_table_association" "primary-a" {
+  subnet_id      = aws_subnet.primary-a.id
+  route_table_id = aws_route_table.primary.id
+}
+
+resource "aws_route_table_association" "primary-b" {
+  subnet_id      = aws_subnet.primary-b.id
+  route_table_id = aws_route_table.primary.id
+}
+
 
 resource "aws_vpc" "secondary-east-2" {
   cidr_block           = "192.168.2.0/24"
@@ -80,4 +98,57 @@ resource "aws_subnet" "secondary-b" {
   provider = aws.east-2
 }
 
+resource "aws_route_table" "secondary" {
+  vpc_id = aws_vpc.secondary-east-2.id
 
+  tags = {
+    Name = "secondary-east-2"
+  }
+
+  provider = aws.east-2
+}
+
+resource "aws_route_table_association" "secondary-a" {
+  subnet_id      = aws_subnet.secondary-a.id
+  route_table_id = aws_route_table.secondary.id
+
+  provider = aws.east-2
+}
+
+resource "aws_route_table_association" "secondary-b" {
+  subnet_id      = aws_subnet.secondary-b.id
+  route_table_id = aws_route_table.secondary.id
+
+  provider = aws.east-2
+}
+
+resource "aws_vpc_peering_connection" "primary-secondary" {
+  peer_owner_id = local.account_id
+  peer_vpc_id   = aws_vpc.secondary-east-2.id
+  vpc_id        = aws_vpc.primary-west-2.id
+  auto_accept   = true
+  peer_region   = "us-east-2"
+
+
+  tags = {
+    Name = "Primary-Secondary"
+  }
+
+  provider = aws.west-2
+}
+
+resource "aws_route" "peering-primary" {
+  route_table_id            = aws_route_table.primary.id
+  destination_cidr_block    = aws_vpc.secondary-east-2.cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.primary-secondary.id
+
+  provider = aws.west-2
+}
+
+resource "aws_route" "peering-secondary" {
+  route_table_id            = aws_route_table.secondary.id
+  destination_cidr_block    = aws_vpc.primary-west-2.cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.primary-secondary.id
+
+  provider = aws.east-2
+}
