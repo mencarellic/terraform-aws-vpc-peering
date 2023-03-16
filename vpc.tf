@@ -130,6 +130,7 @@ resource "aws_vpc_peering_connection" "primary-secondary" {
 
   tags = {
     Name = "Primary-Secondary"
+    Side = "Primary"
   }
 
   provider = aws.west-2
@@ -140,6 +141,7 @@ resource "aws_vpc_peering_connection_accepter" "secondary-primary" {
   auto_accept               = true
 
   tags = {
+    Name = "Primary-Secondary"
     Side = "Secondary"
   }
 
